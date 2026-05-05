@@ -30,7 +30,6 @@ Seguindo a estrutura de projeto solicitada:
 - `/models`: Contém o arquivo `modelo_quantizado.tflite`.
 - `/src`: Códigos-fonte da aplicação.
 - `/data`: Referências ao conjunto de dados MNIST.
-- `notebook.ipynb`: Documentação completa do treinamento e conversão realizada no Google Colab.
 
 ## 🚀 Como utilizar
 1. O modelo está pronto para ser integrado via biblioteca **TensorFlow Lite for Microcontrollers**.
