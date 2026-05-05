@@ -1,39 +1,76 @@
-# Desafio de Deep Learning: Classificação MNIST para TinyML
+# Classificação de Dígitos MNIST com CNN e Otimização para Edge AI
 
-Este projeto apresenta a implementação de uma solução de Visão Computacional focada em **TinyML**, otimizada para execução em dispositivos de hardware limitado (Edge AI), como o microcontrolador **ESP32-S3**.
+## Descrição
 
-## 📋 Resumo do Desafio
-O objetivo foi desenvolver uma Rede Neural Convolucional (CNN) capaz de classificar dígitos manuscritos (0-9) utilizando o dataset MNIST, respeitando restrições severas de engenharia para garantir a eficiência em sistemas embarcados.
+Este projeto implementa um modelo de Visão Computacional para classificar dígitos manuscritos (0-9) do dataset MNIST usando uma Rede Neural Convolucional (CNN). O modelo é treinado em Python com TensorFlow/Keras e posteriormente otimizado para execução em dispositivos Edge usando TensorFlow Lite com Dynamic Range Quantization.
 
-## 🛠️ Requisitos Técnicos Obedecidos
-De acordo com as restrições do projeto:
-- **Arquitetura de Rede:** Implementação de uma CNN com menos de 3 camadas convolucionais para reduzir a carga computacional.
-- **Processamento de Imagem:** Entradas normalizadas de 28x28 pixels em escala de cinza.
-- **Otimização (TinyML):** Conversão do modelo para o formato `.tflite` utilizando **Quantização Inteira (int8)**.
-- **Entrada/Saída Quantizada:** O modelo foi configurado para receber e entregar tensores do tipo `int8`, eliminando a necessidade de emulação de ponto flutuante no hardware alvo.
+## Estrutura do Projeto
 
-## 🧠 Estrutura da CNN
-A rede foi desenhada com a seguinte hierarquia:
-1.  **Conv2D (16 filtros, 3x3)** + MaxPooling2D.
-2.  **Conv2D (32 filtros, 3x3)** + MaxPooling2D.
-3.  **Flatten** + Camada Densa (32 neurônios).
-4.  **Saída (Softmax)** com 10 classes.
+- `train_model.py`: Script para carregar o dataset MNIST, pré-processar os dados, construir e treinar a CNN, avaliar a acurácia e salvar o modelo em formato Keras (.h5).
+- `optimize_model.py`: Script para carregar o modelo treinado (.h5), converter para TensorFlow Lite (.tflite) com otimização de quantização dinâmica, e salvar o modelo otimizado.
+- `requirements.txt`: Lista de dependências Python necessárias.
+- `model.h5`: Arquivo do modelo treinado gerado pelo `train_model.py`.
+- `model.tflite`: Arquivo do modelo otimizado gerado pelo `optimize_model.py`.
+- `README.md`: Este arquivo de documentação.
 
-## 📈 Resultados e Validação
-Os resultados obtidos durante o treinamento e a validação técnica foram:
-- **Acurácia de Validação:** ~98.82%.
-- **Loss de Validação:** ~0.0375.
-- **Status da Conversão:** Sucesso na geração do artefato quantizado para deploy imediato.
+## Como Executar
 
-## 📂 Estrutura do Repositório
-Seguindo a estrutura de projeto solicitada:
-- `/models`: Contém o arquivo `modelo_quantizado.tflite`.
-- `/src`: Códigos-fonte da aplicação.
-- `/data`: Referências ao conjunto de dados MNIST.
+1. Instale as dependências:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## 🚀 Como utilizar
-1. O modelo está pronto para ser integrado via biblioteca **TensorFlow Lite for Microcontrollers**.
-2. Utilize o script de treinamento no Google Colab para replicar os resultados ou ajustar hiperparâmetros.
+2. Execute o treinamento do modelo:
+   ```bash
+   python train_model.py
+   ```
+   Isso irá treinar a CNN no dataset MNIST e salvar o modelo como `model.h5`, exibindo a acurácia final no terminal.
 
----
-**Desenvolvido como parte do Desafio Técnico de Inteligência Artificial.**
+3. Execute a otimização do modelo:
+   ```bash
+   python optimize_model.py
+   ```
+   Isso irá carregar `model.h5`, converter para TensorFlow Lite com Dynamic Range Quantization e salvar como `model.tflite`.
+
+## Arquitetura do Modelo
+
+A Rede Neural Convolucional implementada tem a seguinte estrutura:
+
+- **Entrada**: Imagens de 28x28 pixels em escala de cinza (reshaped para 28x28x1).
+- **Camada Convolucional 1**: 32 filtros de 3x3, ativação ReLU.
+- **Pooling 1**: MaxPooling de 2x2.
+- **Camada Convolucional 2**: 64 filtros de 3x3, ativação ReLU.
+- **Pooling 2**: MaxPooling de 2x2.
+- **Flatten**: Converte a saída 2D em vetor 1D.
+- **Camada Densa 1**: 64 neurônios, ativação ReLU.
+- **Camada de Saída**: 10 neurônios (um para cada dígito), ativação Softmax.
+
+O modelo é compilado com otimizador Adam, loss sparse_categorical_crossentropy e métrica de acurácia.
+
+## Pré-processamento dos Dados
+
+- Carregamento do dataset MNIST via TensorFlow.
+- Normalização dos pixels: divisão por 255.0 para escala [0,1].
+- Reshape das imagens para formato adequado à CNN.
+
+## Resultados
+
+- **Acurácia no conjunto de teste**: Aproximadamente 98.39%.
+- O modelo foi treinado com 1 época para demonstração, mas pode ser ajustado para mais épocas se necessário.
+
+## Otimização para Edge AI
+
+- **Técnica utilizada**: Dynamic Range Quantization.
+- **Objetivo**: Reduzir o tamanho do modelo e acelerar a inferência, mantendo desempenho adequado para dispositivos embarcados e IoT.
+- O modelo .tflite resultante é compatível com TensorFlow Lite Interpreter em plataformas como Raspberry Pi, ESP32, etc.
+
+## Dependências
+
+- TensorFlow >= 2.12
+- NumPy
+
+## Notas
+
+- O treinamento é realizado em CPU.
+- O código foi desenvolvido para ser executado de forma automatizada, sem intervenção manual.
+- Este projeto demonstra o fluxo completo: treinamento → salvamento → conversão → otimização para Edge AI.
